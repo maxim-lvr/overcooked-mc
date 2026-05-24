@@ -2,7 +2,9 @@ package net.maximlvr.overcooked.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import net.maximlvr.overcooked.block.ModBlocks;
+import net.maximlvr.overcooked.block.entity.ModBlockEntities;
 import net.maximlvr.overcooked.block.entity.PanBlockEntity;
+import net.maximlvr.overcooked.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -11,12 +13,13 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +70,7 @@ public class PanBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
-        if (stack.is(Items.BEEF) || stack.is(Items.PORKCHOP)) {
+        if (stack.is(ModItems.PATTY_UNCOOKED.get())) {
             ItemStack itemToStore = stack.copyWithCount(1);
             panBlockEntity.setStoredItem(itemToStore);
 
@@ -79,7 +82,6 @@ public class PanBlock extends BaseEntityBlock {
             return ItemInteractionResult.SUCCESS;
         }
 
-        player.displayClientMessage(Component.literal("Tu peux seulement mettre du steak cru ou du porc cru."), true);
         return ItemInteractionResult.SUCCESS;
     }
 
@@ -100,7 +102,10 @@ public class PanBlock extends BaseEntityBlock {
 
         if (panBlockEntity.hasItem()) {
             CompoundTag panTag = new CompoundTag();
+
             panTag.put("StoredItem", panBlockEntity.getStoredItem().saveOptional(level.registryAccess()));
+            panTag.putInt("BurningProgress", panBlockEntity.getBurningProgress());
+
             panStack.set(DataComponents.CUSTOM_DATA, CustomData.of(panTag));
         }
 
@@ -149,6 +154,23 @@ public class PanBlock extends BaseEntityBlock {
 
         if (!storedItem.isEmpty()) {
             panBlockEntity.setStoredItem(storedItem);
+
+            if (tag.contains("CookingProgress")) {
+                panBlockEntity.setCookingProgress(tag.getInt("CookingProgress"));
+            }
+            if (tag.contains("BurningProgress")) {
+                panBlockEntity.setBurningProgress(tag.getInt("BurningProgress"));
+            }
         }
+    }
+
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+                                                                  BlockEntityType<T> blockEntityType) {
+        return createTickerHelper(
+                blockEntityType,
+                ModBlockEntities.PAN_BE.get(),
+                PanBlockEntity::serverTick
+        );
     }
 }

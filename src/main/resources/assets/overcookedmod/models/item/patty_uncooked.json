@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "overcookedmod:item/patty_uncooked_item_texture"
+  }
+}

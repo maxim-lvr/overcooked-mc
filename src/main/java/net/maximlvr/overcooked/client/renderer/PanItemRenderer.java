@@ -58,9 +58,15 @@ public class PanItemRenderer extends BlockEntityWithoutLevelRenderer {
                                   MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         poseStack.pushPose();
 
-        poseStack.translate(0.5D, 0.14D, 0.5D);
-        poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
-        poseStack.scale(0.42F, 0.42F, 0.42F);
+        if (displayContext == ItemDisplayContext.GUI) {
+            poseStack.translate(0.5D, 0.35D, 0.5D);
+            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+            poseStack.scale(0.9F, 0.9F, 0.9F);
+        } else {
+            poseStack.translate(0.5D, 0.25D, 0.5D);
+            poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+            poseStack.scale(0.65F, 0.65F, 0.65F);
+        }
 
         Minecraft.getInstance().getItemRenderer().renderStatic(
                 storedItem,

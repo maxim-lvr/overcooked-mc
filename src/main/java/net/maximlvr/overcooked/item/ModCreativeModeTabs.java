@@ -24,6 +24,8 @@ public class ModCreativeModeTabs {
                         output.accept(ModBlocks.PAN);
                         output.accept(ModBlocks.BURNER);
                         output.accept(ModBlocks.TRASH);
+                        output.accept(ModItems.PATTY_UNCOOKED);
+                        output.accept(ModItems.PATTY_COOKED);
 
                     }).build());
 
